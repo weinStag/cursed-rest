@@ -67,42 +67,40 @@ func execute_roll():
     is_rolling = true
     can_roll = false
     
-    # Calcula a posição final do roll
-    var roll_target: Vector2i = grid_position + (cur_direction * roll_distance)
+    # Tenta mover múltiplas células na direção do roll
+    var cells_moved: int = 0
+    var last_valid_position: Vector2 = position
     
-    # Verifica colisões no caminho do roll
-    var final_position: Vector2i = grid_position
+    # Tenta rolar pela distância especificada
     for i in range(1, roll_distance + 1):
-        var check_pos: Vector2i = grid_position + (cur_direction * i)
-        var next_pos: Vector2i = Grid.request_move(self, cur_direction, check_pos)
+        var target_position: Vector2 = Grid.request_move(self, cur_direction)
         
-        if next_pos:
-            final_position = check_pos
+        if target_position:
+            last_valid_position = target_position
+            cells_moved += 1
         else:
             break  # Para se encontrar obstáculo
     
-    # Executa o movimento do roll
-    if final_position != grid_position:
+    # Executa o movimento do roll se conseguiu mover pelo menos 1 célula
+    if cells_moved > 0:
         # Animação de roll (você pode personalizar)
         set_anim_direction(cur_direction)
         # Aqui você pode adicionar uma animação específica de roll
         # Ex: $AnimationPlayer.play("roll_" + get_direction_name())
         
-        roll_to(final_position)
+        roll_to(last_valid_position)
     else:
         # Se não conseguiu rolar, cancela o roll
         finish_roll()
 
-func roll_to(target: Vector2i):
+func roll_to(target: Vector2):
     """Move o player para a posição alvo com velocidade de roll"""
     is_moving = true
-    grid_position = target
     
-    var target_world_pos: Vector2 = Grid.grid_to_world(target)
-    var roll_duration: float = base_speed / roll_speed_mult
+    var roll_duration: float = (walk_anim_length / base_speed) / roll_speed_mult
     
     move_tween = create_tween()
-    move_tween.tween_property(self, "position", target_world_pos, roll_duration)
+    move_tween.tween_property(self, "position", target, roll_duration)
     move_tween.finished.connect(_on_roll_finished)
 
 func _on_roll_finished():
