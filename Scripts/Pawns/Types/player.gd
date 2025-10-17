@@ -22,6 +22,10 @@ var roll_cooldown: float = 0.5  # Tempo de cooldown entre rolls (em segundos)
 var can_roll: bool = true
 var roll_timer: Timer
 
+# Detecção de tap vs hold
+var roll_button_press_time: float = 0.0
+var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
+
 func _ready():
     base_speed = speed
     
@@ -32,8 +36,23 @@ func _ready():
     add_child(roll_timer)
     
 func _process(_delta):
-    # Verifica se está segurando o botão de roll para sprint
-    is_sprinting = Input.is_action_pressed("ui_roll")
+    # Sistema de detecção tap vs hold para ui_roll
+    if Input.is_action_just_pressed("ui_roll"):
+        roll_button_press_time = 0.0
+    
+    if Input.is_action_pressed("ui_roll"):
+        roll_button_press_time += _delta
+    
+    # Se soltar o botão rápido (tap), executa roll
+    if Input.is_action_just_released("ui_roll"):
+        if roll_button_press_time <= roll_tap_threshold and can_roll and not is_rolling and can_move():
+            execute_roll()
+            roll_button_press_time = 0.0
+            return
+        roll_button_press_time = 0.0
+    
+    # Sprint: apenas se estiver segurando por mais tempo que o threshold
+    is_sprinting = Input.is_action_pressed("ui_roll") and roll_button_press_time > roll_tap_threshold
     
     # Não permite sprint durante o roll
     if is_rolling:
@@ -44,11 +63,6 @@ func _process(_delta):
     input_priority()
     
     if can_move():
-        # Detecta tap único no botão de roll para executar o roll
-        if Input.is_action_just_pressed("ui_roll") and can_roll and not is_rolling:
-            execute_roll()
-            return
-        
         if Input.is_action_just_pressed("ui_accept"): # To Request dialogue
             Grid.request_event(self, cur_direction, 0)
         
