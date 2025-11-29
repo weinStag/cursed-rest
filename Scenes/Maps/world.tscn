@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=4 uid="uid://cktlplg0urpum"]
+[gd_scene load_steps=19 format=4 uid="uid://cktlplg0urpum"]
 
 [ext_resource type="Texture2D" uid="uid://clolt0da1hneb" path="res://Graphics/CollisionTiles/actor.png" id="1_ayd0k"]
 [ext_resource type="Script" uid="uid://cn105jtyy8nxv" path="res://Scripts/setup.gd" id="1_d0dyq"]
@@ -14,9 +14,6 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r0r7l"]
 size = Vector2(64, 256)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_08va7"]
-size = Vector2(16, 24)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_u76ut"]
 texture = ExtResource("1_ayd0k")
@@ -1196,12 +1193,6 @@ position = Vector2(238, 87)
 move_pattern = Array[Vector2i]([Vector2i(1, 0), Vector2i(1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(-1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, 0)])
 dialogue_keys = Array[String](["text1", "text2", "text3", "text4"])
 speed = 1.0
-
-[node name="Area2D" type="Area2D" parent="Pawns/Actor2"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pawns/Actor2/Area2D"]
-position = Vector2(0, -5)
-shape = SubResource("RectangleShape2D_08va7")
 
 [node name="Actor_Grid" type="TileMapLayer" parent="."]
 visible = false
