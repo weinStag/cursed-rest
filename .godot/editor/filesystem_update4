@@ -1,6 +1,5 @@
 res://Scenes/arma.tscn
 res://Scripts/Pawns/Types/player.gd
+res://Scenes/Maps/world.tscn
 res://Scenes/arma.gd
 res://Scenes/gameview.tscn
-res://Scenes/Maps/world.tscn
-res://Scenes/Pawns/inimigo.tscn
