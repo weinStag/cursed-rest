@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://csp4gdb2j0fmr"]
+
+[ext_resource type="PackedScene" uid="uid://d3xeykecmo176" path="res://Scenes/Pawns/actor.tscn" id="1_x4n3m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3sqja"]
+size = Vector2(16, 24)
+
+[node name="Actor" instance=ExtResource("1_x4n3m")]
+
+[node name="Sprite" parent="." index="0"]
+modulate = Color(0, 0.486275, 0.196078, 1)
+
+[node name="Area2D" type="Area2D" parent="Sprite" index="0"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Area2D" index="0" groups=["hitbox"]]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_3sqja")
