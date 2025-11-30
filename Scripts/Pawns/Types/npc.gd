@@ -40,3 +40,7 @@ func trigger_event(direction: Vector2i):
 	if not is_moving:
 		set_anim_direction(-direction) # Face player
 		emit_signal("trigger_dialogue", dialogue, set_talking)
+
+
+func _on_area_2d_area_entered(area: Area2D) -> void:
+	pass # Replace with function body.

@@ -188,3 +188,8 @@ func get_direction_name() -> String:
 		Vector2i.LEFT: return "left"
 		Vector2i.RIGHT: return "right"
 		_: return "down"
+
+
+func _on_area_2d_area_entered(area) -> void:
+	if area.is_in_group("hitbox"):
+		$arma/AnimationPlayer.play("new_animation")

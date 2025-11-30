@@ -1,5 +1,7 @@
-res://Scenes/arma.tscn
+res://Scripts/Pawns/Types/npc.gd
 res://Scripts/Pawns/Types/player.gd
-res://Scenes/Maps/world.tscn
-res://Scenes/arma.gd
+res://Scenes/Pawns/player.tscn
+res://Scenes/Pawns/arma.gd
 res://Scenes/gameview.tscn
+res://Scenes/Maps/world.tscn
+res://Scenes/arma.tscn

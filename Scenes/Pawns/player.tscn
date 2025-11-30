@@ -1,7 +1,10 @@
-[gd_scene load_steps=37 format=3 uid="uid://82egl20vpf7n"]
+[gd_scene load_steps=44 format=3 uid="uid://82egl20vpf7n"]
 
 [ext_resource type="Script" uid="uid://bbu8j0ryeda7i" path="res://Scripts/Pawns/Types/player.gd" id="1_cghlj"]
 [ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_dy3y1"]
+[ext_resource type="Texture2D" uid="uid://fhhrc5ktpq0l" path="res://Graphics/CollisionTiles/event.png" id="3_5pnro"]
+[ext_resource type="Script" uid="uid://dokac2uqwhnux" path="res://Scenes/Pawns/arma.gd" id="4_tlhq4"]
+[ext_resource type="Texture2D" uid="uid://vwmpi5st1if5" path="res://Graphics/CollisionTiles/obstacle.png" id="5_tlhq4"]
 
 [sub_resource type="Animation" id="Animation_5p5oj"]
 resource_name = "idle_down"
@@ -310,6 +313,45 @@ nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_17258")
 nodes/TimeScale/position = Vector2(160, 140)
 node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s70le"]
+size = Vector2(16.5333, 16)
+
+[sub_resource type="Animation" id="Animation_s70le"]
+resource_name = "new_animation"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0333333, 0.333333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [ExtResource("5_tlhq4"), ExtResource("5_tlhq4")]
+}
+
+[sub_resource type="Animation" id="Animation_c5sun"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_dy3y1")]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_rsh2f"]
+_data = {
+&"RESET": SubResource("Animation_c5sun"),
+&"new_animation": SubResource("Animation_s70le")
+}
+
 [node name="Player" type="Node2D"]
 script = ExtResource("1_cghlj")
 
@@ -322,7 +364,7 @@ frame = 7
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_muhrx")
+&"": SubResource("AnimationLibrary_muhrx")
 }
 autoplay = "idle_down"
 
@@ -333,3 +375,23 @@ parameters/StateMachine/Idle/blend_position = Vector2(0, 1)
 parameters/StateMachine/Walk0/blend_position = Vector2(0, 1)
 parameters/StateMachine/Walk1/blend_position = Vector2(0, 1)
 parameters/TimeScale/scale = 1.0
+
+[node name="arma" type="Sprite2D" parent="."]
+position = Vector2(6, -1)
+scale = Vector2(0.9375, 0.1875)
+texture = ExtResource("3_5pnro")
+centered = false
+script = ExtResource("4_tlhq4")
+
+[node name="Area2D" type="Area2D" parent="arma"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="arma/Area2D"]
+position = Vector2(7.73335, 8)
+shape = SubResource("RectangleShape2D_s70le")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="arma"]
+libraries = {
+&"": SubResource("AnimationLibrary_rsh2f")
+}
+
+[connection signal="area_entered" from="arma/Area2D" to="." method="_on_area_2d_area_entered"]
