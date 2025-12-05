@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://jl1xd7v4vsli"]
+
+[ext_resource type="Texture2D" uid="uid://clolt0da1hneb" path="res://Graphics/CollisionTiles/actor.png" id="1_e0onf"]
+
+[node name="Hud" type="CanvasLayer"]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_right = 40.0
+offset_bottom = 16.0
+texture = ExtResource("1_e0onf")

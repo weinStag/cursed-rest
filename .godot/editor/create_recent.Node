@@ -1,3 +1,8 @@
+TextureRect
+GraphNode
+GraphEdit
+LineEdit
+CanvasLayer
 AnimationPlayer
 CollisionShape2D
 Area2D

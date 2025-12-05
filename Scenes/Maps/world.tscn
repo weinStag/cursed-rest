@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=4 uid="uid://cktlplg0urpum"]
+[gd_scene load_steps=19 format=4 uid="uid://cktlplg0urpum"]
 
 [ext_resource type="Texture2D" uid="uid://clolt0da1hneb" path="res://Graphics/CollisionTiles/actor.png" id="1_ayd0k"]
 [ext_resource type="Script" uid="uid://cn105jtyy8nxv" path="res://Scripts/setup.gd" id="1_d0dyq"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://ba2k8pkwqebpe" path="res://Scripts/Pawns/Types/event.gd" id="7_8j5fh"]
 [ext_resource type="Script" uid="uid://dhojxqc0a4xvw" path="res://Scripts/Pawns/Types/object.gd" id="7_ay8ee"]
 [ext_resource type="Texture2D" uid="uid://fhhrc5ktpq0l" path="res://Graphics/CollisionTiles/event.png" id="9_60kqf"]
+[ext_resource type="PackedScene" uid="uid://jl1xd7v4vsli" path="res://Scenes/hud.tscn" id="11_r0r7l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_08va7"]
 size = Vector2(16, 24)
@@ -1204,3 +1205,7 @@ tile_map_data = PackedByteArray("AAADAAgAAwAYAAcAAAAEAAgAAwAZAAcAAAAFAAgAAwAZAAc
 tile_set = SubResource("TileSet_252o2")
 collision_enabled = false
 navigation_enabled = false
+
+[node name="Hud" parent="." instance=ExtResource("11_r0r7l")]
+offset = Vector2(9, 2)
+transform = Transform2D(1, 0, 0, 1, 9, 2)
