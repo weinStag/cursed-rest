@@ -31,6 +31,14 @@ var roll_cooldown: float = 0.5  # Tempo de cooldown entre rolls (em segundos)
 var can_roll: bool = true
 var roll_timer: Timer
 
+# Knockback System
+var is_knockbacking: bool = false
+var knockback_distance: int = 2
+var knockback_speed_mult: float = 7.5
+var knockback_cooldown: float = 0.25
+var can_kockback: bool = true
+var knockback_timer: Timer
+
 # Detecção de tap vs hold
 var roll_button_press_time: float = 0.0
 var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
@@ -204,7 +212,7 @@ func calc_damage(damage) -> int:
 	var new_health = current_life + current_vitality - damage
 	return new_health
 
-func apply_knockback(value) -> void:
+func apply_knockback(direction) -> void:
 	is_moving = true
 
 func _on_area_2d_area_entered(area) -> void:
@@ -214,5 +222,5 @@ func _on_area_2d_area_entered(area) -> void:
 		if (new_health <= 0):
 			$arma/AnimationPlayer.play("new_animation")
 		else:
-			apply_knockback(5)
+			apply_knockback(area.)
 		

@@ -354,6 +354,8 @@ size = Vector2(16, 23)
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_cghlj")
+speed = null
+type = null
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_dy3y1")
