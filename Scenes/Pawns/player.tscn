@@ -313,9 +313,6 @@ nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_17258")
 nodes/TimeScale/position = Vector2(160, 140)
 node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_s70le"]
-size = Vector2(16.5333, 16)
-
 [sub_resource type="Animation" id="Animation_c5sun"]
 length = 0.001
 tracks/0/type = "value"
@@ -352,6 +349,9 @@ _data = {
 &"new_animation": SubResource("Animation_s70le")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tlhq4"]
+size = Vector2(16, 23)
+
 [node name="Player" type="Node2D"]
 script = ExtResource("1_cghlj")
 
@@ -377,21 +377,22 @@ parameters/StateMachine/Walk1/blend_position = Vector2(0, 1)
 parameters/TimeScale/scale = 1.0
 
 [node name="arma" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(6, -1)
 scale = Vector2(0.9375, 0.1875)
 texture = ExtResource("3_5pnro")
 centered = false
 script = ExtResource("4_tlhq4")
 
-[node name="Area2D" type="Area2D" parent="arma"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="arma/Area2D"]
-position = Vector2(7.73335, 8)
-shape = SubResource("RectangleShape2D_s70le")
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="arma"]
 libraries = {
 &"": SubResource("AnimationLibrary_rsh2f")
 }
 
-[connection signal="area_entered" from="arma/Area2D" to="." method="_on_area_2d_area_entered"]
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, -4.5)
+shape = SubResource("RectangleShape2D_tlhq4")
+
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]

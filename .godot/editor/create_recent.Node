@@ -1,9 +1,12 @@
+CollisionShape2D
+Area2D
+PawnMobile
+Panel
+NinePatchRect
 TextureRect
 GraphNode
 GraphEdit
 LineEdit
 CanvasLayer
 AnimationPlayer
-CollisionShape2D
-Area2D
 Sprite2D

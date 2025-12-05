@@ -1,5 +1,14 @@
 extends PawnMobile
 
+var status: Dictionary = {
+	'health': 250,
+	'stamina': 100,
+	'vitality': 10,
+	'breath': 10,
+	'strength': 10,
+	'agility': 10
+}
+
 const MOVEMENTS: Dictionary = {
 	'ui_up': Vector2i.UP,
 	'ui_left': Vector2i.LEFT,
@@ -189,7 +198,21 @@ func get_direction_name() -> String:
 		Vector2i.RIGHT: return "right"
 		_: return "down"
 
+func calc_damage(damage) -> int:
+	var current_life = status.get('health')
+	var current_vitality = status.get('vitality')
+	var new_health = current_life + current_vitality - damage
+	return new_health
+
+func apply_knockback(value) -> void:
+	is_moving = true
 
 func _on_area_2d_area_entered(area) -> void:
 	if area.is_in_group("hitbox"):
-		$arma/AnimationPlayer.play("new_animation")
+		var new_health = calc_damage(50)
+		status.set('health', new_health)
+		if (new_health <= 0):
+			$arma/AnimationPlayer.play("new_animation")
+		else:
+			apply_knockback(5)
+		

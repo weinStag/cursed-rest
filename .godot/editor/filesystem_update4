@@ -1,4 +1,7 @@
-res://Scenes/Maps/world.tscn
 res://Scenes/gameview.tscn
+res://Scenes/Maps/world.tscn
 res://Scenes/Pawns/player.tscn
 res://Scenes/hud.tscn
+res://Scenes/Pawns/actor.tscn
+res://Scenes/Pawns/inimigo.tscn
+res://Scripts/Pawns/Types/player.gd
