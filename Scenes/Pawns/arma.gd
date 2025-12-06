@@ -10,3 +10,7 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+func attack() -> void:
+	if Input.is_action_just_pressed('ui_mb1'):
+		$AnimationPlayer.play("new_animation")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://csp4gdb2j0fmr"]
+[gd_scene load_steps=39 format=3 uid="uid://csp4gdb2j0fmr"]
 
 [ext_resource type="Script" uid="uid://d1444qlxad2l1" path="res://Scripts/Pawns/Types/npc.gd" id="1_3sqja"]
 [ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_5n1dt"]
@@ -304,12 +304,17 @@ transitions = ["Start", "Idle", SubResource("AnimationNodeStateMachineTransition
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_17258"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_6ixg4"]
-graph_offset = Vector2(-259.661, 45.2562)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_p7un2")
 nodes/StateMachine/position = Vector2(-80, 140)
 nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_17258")
 nodes/TimeScale/position = Vector2(160, 140)
 node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3sqja"]
+size = Vector2(16, 23)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5n1dt"]
+radius = 38.0132
 
 [node name="Inimigo" type="Node2D"]
 script = ExtResource("1_3sqja")
@@ -335,3 +340,18 @@ parameters/StateMachine/Idle/blend_position = Vector2(0, 1)
 parameters/StateMachine/Walk0/blend_position = Vector2(0, 1)
 parameters/StateMachine/Walk1/blend_position = Vector2(0, 1)
 parameters/TimeScale/scale = 1.0
+
+[node name="hitbox" type="Area2D" parent="." groups=["hitbox"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+position = Vector2(0, -4.5)
+shape = SubResource("RectangleShape2D_3sqja")
+
+[node name="visao" type="Area2D" parent="." groups=["visao"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="visao"]
+shape = SubResource("CircleShape2D_5n1dt")
+debug_color = Color(0.907035, 0.289866, 0.223736, 0.42)
+
+[connection signal="area_entered" from="visao" to="." method="_on_visao_area_entered"]
+[connection signal="area_exited" from="visao" to="." method="_on_visao_area_exited"]

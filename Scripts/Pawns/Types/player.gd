@@ -220,7 +220,8 @@ func _on_area_2d_area_entered(area) -> void:
 		var new_health = calc_damage(50)
 		status.set('health', new_health)
 		if (new_health <= 0):
-			$arma/AnimationPlayer.play("new_animation")
+			pass
 		else:
-			apply_knockback(area.)
+			pass
+			#apply_knockback(area)
 		

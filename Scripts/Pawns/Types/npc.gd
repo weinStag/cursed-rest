@@ -5,6 +5,9 @@ extends PawnMobile
 @export var move_pattern: Array[Vector2i]
 @export var dialogue_keys: Array[String] 
 
+var player: Node2D = null
+
+
 # Movement Related (+ animation)
 var move_step: int = 0
 
@@ -13,6 +16,12 @@ var move_step: int = 0
 
 func _process(_delta):
 	# Allow movement if conditions are meet
+	if player:
+		move_towards_player()
+	else:
+		process_default_movement()
+	
+func process_default_movement():
 	if can_move():
 		var current_step: Vector2i = move_pattern[move_step]	
 		if current_step:
@@ -42,5 +51,33 @@ func trigger_event(direction: Vector2i):
 		emit_signal("trigger_dialogue", dialogue, set_talking)
 
 
-func _on_area_2d_area_entered(area: Area2D) -> void:
-	pass # Replace with function body.
+func get_direction_to_player() -> Vector2i:
+	var diff: Vector2 = player.global_position - global_position
+
+	# Escolher o eixo dominante (para manter movimento tile-based)
+	if abs(diff.x) > abs(diff.y):
+		return Vector2i(sign(diff.x), 0)
+	else:
+		return Vector2i(0, sign(diff.y))
+
+func move_towards_player():
+	if not can_move(): return
+	
+	var direction := get_direction_to_player()
+	if direction == Vector2i.ZERO:
+		return
+		
+	set_anim_direction(direction)
+
+	var target_position = Grid.request_move(self, direction)
+	if target_position:
+		move_to(target_position)
+
+func _on_visao_area_entered(area: Area2D) -> void:
+	if area.get_parent().is_in_group("player"):
+		player = area.get_parent()
+
+
+func _on_visao_area_exited(area: Area2D) -> void:
+	if area.get_parent().is_in_group("player"):
+		player = null 
