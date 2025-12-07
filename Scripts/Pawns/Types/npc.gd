@@ -5,6 +5,12 @@ extends PawnMobile
 @export var move_pattern: Array[Vector2i]
 @export var dialogue_keys: Array[String] 
 
+#Attack related
+@export var attack_distance := 24  # pixels
+@export var attack_cooldown := 1.5
+var can_attack := true
+
+
 var player: Node2D = null
 
 
@@ -17,10 +23,41 @@ var move_step: int = 0
 func _process(_delta):
 	# Allow movement if conditions are meet
 	if player:
-		move_towards_player()
+		if is_in_attack_range():
+			attack()
+		else:
+			move_towards_player()
 	else:
 		process_default_movement()
+
+func is_in_attack_range() -> bool:
+	if not player:
+		return false
+	return global_position.distance_to(player.global_position) <= attack_distance
+
+func attack():
+	if not can_attack:
+		return
 	
+	# pausa movimento enquanto ataca
+	is_stopped = true
+	
+	can_attack = false
+	print("ATACOU o jogador!")
+
+	# animação (se tiver)
+	#set_anim_direction(get_direction_to_player())
+
+	# aplicar dano
+	if player.has_method("calc_damage"):
+		player.calc_damage(10)
+
+	await get_tree().create_timer(attack_cooldown).timeout
+
+	is_stopped = false
+	can_attack = true
+
+
 func process_default_movement():
 	if can_move():
 		var current_step: Vector2i = move_pattern[move_step]	
