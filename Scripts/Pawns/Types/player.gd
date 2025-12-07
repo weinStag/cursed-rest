@@ -16,6 +16,8 @@ const MOVEMENTS: Dictionary = {
 	'ui_down': Vector2i.DOWN
 }
 
+var is_dead: bool = false
+
 # Movement Related (+ animation)
 var input_history: Array[String] = []
 var cur_direction: Vector2i = Vector2i.DOWN
@@ -235,6 +237,7 @@ func die():
 	is_talking = true
 	is_rolling = false
 	is_moving = false
+	is_dead = true
 	# Aqui você pode chamar animação, respawn, tela game over, etc.
 
 

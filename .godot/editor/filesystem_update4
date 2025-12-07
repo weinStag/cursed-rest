@@ -1,9 +1,8 @@
-res://Text/game_text.en.translation
-res://Text/game_text.fr.translation
-res://Scenes/Maps/world.tscn
-res://Scripts/Pawns/Types/player.gd
 res://Scenes/gameview.tscn
+res://Scenes/Maps/world.tscn
 res://Scenes/Pawns/player.tscn
 res://Scenes/hud.tscn
 res://Scenes/Pawns/actor.tscn
 res://Scenes/Pawns/inimigo.tscn
+res://Scripts/Pawns/Types/npc.gd
+res://Scripts/Pawns/Types/player.gd

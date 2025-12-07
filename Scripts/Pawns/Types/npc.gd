@@ -23,7 +23,7 @@ var move_step: int = 0
 func _process(_delta):
 	# Allow movement if conditions are meet
 	if player:
-		if is_in_attack_range():
+		if is_in_attack_range() and !player.is_dead:
 			attack()
 		else:
 			move_towards_player()
