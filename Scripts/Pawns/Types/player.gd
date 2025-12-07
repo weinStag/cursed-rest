@@ -52,6 +52,16 @@ func _ready():
 	roll_timer.timeout.connect(_on_roll_cooldown_finished)
 	add_child(roll_timer)
 	
+		# timer knockback
+	knockback_timer = Timer.new()
+	knockback_timer.one_shot = true
+	knockback_timer.timeout.connect(_on_knockback_cooldown)
+	add_child(knockback_timer)
+
+func _on_knockback_cooldown():
+	can_kockback = true
+
+
 func _process(_delta):
 	# Sistema de detecção tap vs hold para ui_roll
 	if Input.is_action_just_pressed("ui_roll"):
@@ -234,16 +244,58 @@ func calc_damage(damage) -> int:
 	var new_health = current_life + current_vitality - damage
 	return new_health
 
-func apply_knockback(direction) -> void:
+func apply_knockback(attacker: Node2D) -> void:
+	if not can_kockback or is_knockbacking or is_rolling:
+		return
+
+	var dir_vec := (global_position - attacker.global_position).normalized()
+	var dir := Vector2i(sign(dir_vec.x), sign(dir_vec.y))
+
+	is_knockbacking = true
+	can_kockback = false
+
+	var cells_moved := 0
+	var last_valid_pos := position
+
+	for i in range(knockback_distance):
+		var next_pos: Vector2 = Grid.request_move(self, dir)
+
+		if next_pos:
+			last_valid_pos = next_pos
+			cells_moved += 1
+		else:
+			break
+
+	if cells_moved > 0:
+		_knockback_to(last_valid_pos)
+	else:
+		_finish_knockback()
+
+func _knockback_to(target: Vector2):
 	is_moving = true
 
-func _on_area_2d_area_entered(area) -> void:
+	var duration = (walk_anim_length / base_speed) / knockback_speed_mult
+
+	move_tween = create_tween()
+	move_tween.tween_property(self, "position", target, duration)
+	move_tween.finished.connect(_on_knockback_done)
+
+func _on_knockback_done():
+	move_tween.kill()
+	_finish_knockback()
+
+func _finish_knockback():
+	is_knockbacking = false
+	is_moving = false
+
+	knockback_timer.start(knockback_cooldown)
+
+	Grid.request_event(self, Vector2i.ZERO, 2)
+
+
+func _on_area_2d_area_entered(area: Area2D):
 	if area.is_in_group("hitbox"):
-		var new_health = calc_damage(50)
-		status.set('health', new_health)
-		if (new_health <= 0):
-			pass
-		else:
-			pass
-			#apply_knockback(area)
+		receive_damage(50)
+		apply_knockback(area.get_parent())
+
 		
