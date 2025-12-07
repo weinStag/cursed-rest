@@ -206,6 +206,28 @@ func get_direction_name() -> String:
 		Vector2i.RIGHT: return "right"
 		_: return "down"
 
+func receive_damage(amount: int, from_direction := Vector2.ZERO) -> void:
+	var new_health = calc_damage(amount)
+	status["health"] = new_health
+	
+	print("Player recebeu", amount, "dano. HP =", new_health)
+
+	# --- opcional (knockback ou animação) ---
+	if new_health > 0:
+		#apply_knockback(from_direction)
+		pass
+	else:
+		die()
+
+func die():
+	print("Player morreu!")
+	# Desabilita movimento
+	is_talking = true
+	is_rolling = false
+	is_moving = false
+	# Aqui você pode chamar animação, respawn, tela game over, etc.
+
+
 func calc_damage(damage) -> int:
 	var current_life = status.get('health')
 	var current_vitality = status.get('vitality')
