@@ -8,3 +8,9 @@
 offset_right = 40.0
 offset_bottom = 16.0
 texture = ExtResource("1_e0onf")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_top = -5.0
+offset_right = 41.0
+offset_bottom = 27.0
+text = "teste"
