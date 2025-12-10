@@ -218,26 +218,27 @@ func get_direction_name() -> String:
 		Vector2i.RIGHT: return "right"
 		_: return "down"
 
-func receive_damage(amount: int, from_direction := Vector2.ZERO) -> void:
-	var new_health = calc_damage(amount)
-	status["health"] = new_health
-	
-	print("Player recebeu", amount, "dano. HP =", new_health)
+func receive_damage(amount: int, attacker: Node2D):
+	if attacker == null:
+		return
 
-	# --- opcional (knockback ou animação) ---
+	var new_health := calc_damage(amount)
+	print(new_health)
+	status["health"] = new_health
+
 	if new_health > 0:
-		#apply_knockback(from_direction)
-		pass
+		apply_knockback(attacker)
 	else:
-		die()
+		pass
+		#die()
 
 func die():
 	print("Player morreu!")
 	# Desabilita movimento
-	is_talking = true
-	is_rolling = false
-	is_moving = false
-	is_dead = true
+	#is_talking = true
+	#is_rolling = false
+	#is_moving = false
+	#is_dead = true
 	# Aqui você pode chamar animação, respawn, tela game over, etc.
 
 
@@ -247,32 +248,40 @@ func calc_damage(damage) -> int:
 	var new_health = current_life + current_vitality - damage
 	return new_health
 
-func apply_knockback(attacker: Node2D) -> void:
+func apply_knockback(attacker: Node2D):
 	if not can_kockback or is_knockbacking or is_rolling:
 		return
 
-	var dir_vec := (global_position - attacker.global_position).normalized()
-	var dir := Vector2i(sign(dir_vec.x), sign(dir_vec.y))
+	# calcula direção cardinal do impacto
+	var diff := global_position - attacker.global_position
+	var dir := Vector2i.ZERO
+
+	if diff == Vector2.ZERO:
+		dir = -cur_direction
+	else:
+		if abs(diff.x) > abs(diff.y):
+			dir = Vector2i(sign(diff.x), 0)
+		else:
+			dir = Vector2i(0, sign(diff.y))
+
+	# distância depende do atacante (Enemy ou Boss)
+	var force := knockback_distance
+	if "knockback_distance" in attacker:
+		force = attacker.knockback_distance
 
 	is_knockbacking = true
 	can_kockback = false
 
-	var cells_moved := 0
-	var last_valid_pos := position
-
-	for i in range(knockback_distance):
-		var next_pos: Vector2 = Grid.request_move(self, dir)
-
-		if next_pos:
-			last_valid_pos = next_pos
-			cells_moved += 1
+	var last_valid := position
+	for i in range(force):
+		var next = Grid.request_move(self, dir)
+		if next:
+			last_valid = next
 		else:
 			break
 
-	if cells_moved > 0:
-		_knockback_to(last_valid_pos)
-	else:
-		_finish_knockback()
+	_knockback_to(last_valid)
+
 
 func _knockback_to(target: Vector2):
 	is_moving = true
@@ -297,8 +306,14 @@ func _finish_knockback():
 
 
 func _on_area_2d_area_entered(area: Area2D):
-	if area.is_in_group("hitbox"):
-		receive_damage(50)
-		apply_knockback(area.get_parent())
+	var attacker := area.get_parent()
+	if not attacker:
+		return
 
-		
+	if area.is_in_group("hitbox"):
+		receive_damage(50, attacker)
+		return
+
+	if area.is_in_group("hitbox_boss"):
+		receive_damage(75, attacker)
+		return

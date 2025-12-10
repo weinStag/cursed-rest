@@ -1,7 +1,7 @@
-[gd_scene load_steps=39 format=3 uid="uid://csp4gdb2j0fmr"]
+[gd_scene load_steps=39 format=3 uid="uid://bu8aoo16dkdmu"]
 
-[ext_resource type="Script" uid="uid://m3ko5erqjo36" path="res://Scripts/Pawns/Types/enemy.gd" id="1_3sqja"]
-[ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_5n1dt"]
+[ext_resource type="Script" uid="uid://x4ynb0sefm2q" path="res://Scripts/Pawns/Types/boss.gd" id="1_oyfy5"]
+[ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_572v3"]
 
 [sub_resource type="Animation" id="Animation_5p5oj"]
 resource_name = "idle_down"
@@ -316,12 +316,12 @@ size = Vector2(16, 23)
 [sub_resource type="CircleShape2D" id="CircleShape2D_5n1dt"]
 radius = 38.0132
 
-[node name="Inimigo" type="Node2D"]
-script = ExtResource("1_3sqja")
+[node name="Boss" type="Node2D"]
+script = ExtResource("1_oyfy5")
 
 [node name="Sprite" type="Sprite2D" parent="."]
-modulate = Color(0, 0.486275, 0.164706, 1)
-texture = ExtResource("2_5n1dt")
+modulate = Color(0.684705, 0.218675, 0.114471, 1)
+texture = ExtResource("2_572v3")
 offset = Vector2(0, -8)
 hframes = 3
 vframes = 4
@@ -341,7 +341,7 @@ parameters/StateMachine/Walk0/blend_position = Vector2(0, 1)
 parameters/StateMachine/Walk1/blend_position = Vector2(0, 1)
 parameters/TimeScale/scale = 1.0
 
-[node name="hitbox" type="Area2D" parent="." groups=["hitbox"]]
+[node name="hitbox" type="Area2D" parent="." groups=["hitbox_boss"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
 position = Vector2(0, -4.5)

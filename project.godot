@@ -28,6 +28,7 @@ window/stretch/mode="viewport"
 
 hitbox=""
 visao="indica o campo de visão de um inimigo"
+hitbox_boss=""
 
 [input]
 
