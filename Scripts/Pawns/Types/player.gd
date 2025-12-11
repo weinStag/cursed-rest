@@ -304,6 +304,12 @@ func _finish_knockback():
 
 	Grid.request_event(self, Vector2i.ZERO, 2)
 
+func deal_damage(target: Node2D, amount: int):
+	if target == null:
+		return
+
+	if target.has_method("receive_damage"):
+		target.receive_damage(amount, self)
 
 func _on_area_2d_area_entered(area: Area2D):
 	var attacker := area.get_parent()
@@ -317,3 +323,11 @@ func _on_area_2d_area_entered(area: Area2D):
 	if area.is_in_group("hitbox_boss"):
 		receive_damage(75, attacker)
 		return
+
+
+func _on_hitbox_arma_area_entered(area: Area2D) -> void:
+	var enemy = area.get_parent()
+	if enemy.is_in_group("enemy"):
+		deal_damage(enemy, 25)
+	elif enemy.is_in_group("boss"):
+		deal_damage(enemy, 40)

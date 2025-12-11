@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://82egl20vpf7n"]
+[gd_scene load_steps=44 format=3 uid="uid://82egl20vpf7n"]
 
 [ext_resource type="Script" uid="uid://bbu8j0ryeda7i" path="res://Scripts/Pawns/Types/player.gd" id="1_cghlj"]
 [ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_dy3y1"]
@@ -348,6 +348,9 @@ _data = {
 &"new_animation": SubResource("Animation_s70le")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5pnro"]
+size = Vector2(57.6, 15.3333)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tlhq4"]
 size = Vector2(16, 23)
 
@@ -387,10 +390,17 @@ libraries = {
 &"": SubResource("AnimationLibrary_rsh2f")
 }
 
+[node name="hitbox_arma" type="Area2D" parent="arma" groups=["ataque"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="arma/hitbox_arma"]
+position = Vector2(35.2, 2.33333)
+shape = SubResource("RectangleShape2D_5pnro")
+
 [node name="Area2D" type="Area2D" parent="." groups=["player"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(0, -4.5)
 shape = SubResource("RectangleShape2D_tlhq4")
 
+[connection signal="area_entered" from="arma/hitbox_arma" to="." method="_on_hitbox_arma_area_entered"]
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]

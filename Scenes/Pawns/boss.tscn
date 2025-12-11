@@ -316,7 +316,7 @@ size = Vector2(16, 23)
 [sub_resource type="CircleShape2D" id="CircleShape2D_5n1dt"]
 radius = 38.0132
 
-[node name="Boss" type="Node2D"]
+[node name="Boss" type="Node2D" groups=["boss"]]
 script = ExtResource("1_oyfy5")
 
 [node name="Sprite" type="Sprite2D" parent="."]
