@@ -363,9 +363,11 @@ func _on_area_2d_area_entered(area: Area2D):
 		return
 
 
-func _on_hitbox_arma_area_entered(area: Area2D) -> void:
+func _on_sword_area_area_entered(area):
+	print("acertou:", area.name)
 	var enemy = area.get_parent()
 	if enemy.is_in_group("enemy"):
 		deal_damage(enemy, 25)
 	elif enemy.is_in_group("boss"):
 		deal_damage(enemy, 40)
+		

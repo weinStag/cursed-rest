@@ -405,4 +405,4 @@ position = Vector2(14.4, 2.33333)
 shape = SubResource("RectangleShape2D_5pnro")
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
-[connection signal="area_entered" from="SwordPivot/SwordArea" to="." method="_on_hitbox_arma_area_entered"]
+[connection signal="area_entered" from="SwordPivot/SwordArea" to="." method="_on_sword_area_area_entered"]

@@ -1,4 +1,4 @@
-res://Scenes/Pawns/player.tscn
 res://Scripts/Pawns/Types/player.gd
+res://Scenes/Pawns/player.tscn
 res://Scenes/gameview.tscn
 res://Scenes/Maps/world.tscn
