@@ -16,7 +16,7 @@ var health := 100
 @export var damage := 10
 @export var knockback_distance := 2
 @export var attack_distance := 24
-@export var attack_cooldown := 1.2
+@export var attack_cooldown := 3
 
 var can_attack := true
 var player: Node2D = null
@@ -25,7 +25,14 @@ var move_step := 0
 @onready var move_max := move_pattern.size()
 @onready var dialogue := GbmUtils.get_dialogue(dialogue_keys)
 
+@onready var attack_hitbox: Area2D = $AttackHitbox
+@onready var hitbox_shape: CollisionShape2D = $AttackHitbox/CollisionShape2D
+@onready var attack_sprite: Sprite2D = $AttackHitbox/AttackSprite
+
 func _ready():
+	attack_hitbox.monitoring = false
+	attack_hitbox.set_collision_layer_value(3, true) # layer inimigo
+	attack_hitbox.set_collision_mask_value(1, true)  # player
 	health = max_health
 
 func _process(_delta):
@@ -42,26 +49,54 @@ func is_in_attack_range() -> bool:
 	return player and global_position.distance_to(player.global_position) <= attack_distance
 
 
-func attack() -> void:
+func attack():
 	if not can_attack:
 		return
-
 	can_attack = false
+
 	is_stopped = true
 
-	if player.has_method("receive_damage"):
-		player.receive_damage(damage, self)
+	var dir := get_direction_to_player()
+	if dir == Vector2i.ZERO:
+		dir = Vector2i.DOWN
 
+	# posiciona a hitbox na direção certa
+	position_attack_hitbox(dir)
+
+	# ativa hitbox e visual
+	attack_hitbox.monitoring = true
+	attack_sprite.visible = true
+
+	# tempo em que o ataque fica ativo (hitbox + sprite)
+	await get_tree().create_timer(0.15).timeout
+
+	# desativa hitbox e sprite
+	attack_hitbox.monitoring = false
+	attack_sprite.visible = false
+
+	# cooldown do ataque
 	await get_tree().create_timer(attack_cooldown).timeout
-	can_attack = true
+
 	is_stopped = false
+	can_attack = true
+
+
+func position_attack_hitbox(dir: Vector2i):
+	var cell_size := 16 # ou o tamanho da SUA tile
+	var offset := Vector2(dir.x * cell_size, dir.y * cell_size)
+	attack_hitbox.position = offset
+
+	# opcional: rotacionar sprite pela direção
+	attack_sprite.rotation = atan2(dir.y, dir.x)
 
 
 func get_direction_to_player() -> Vector2i:
 	var diff := player.global_position - global_position
+
 	if abs(diff.x) > abs(diff.y):
 		return Vector2i(sign(diff.x), 0)
-	return Vector2i(0, sign(diff.y))
+	else:
+		return Vector2i(0, sign(diff.y))
 
 
 func move_towards_player():
@@ -129,3 +164,10 @@ func _on_visao_area_exited(area):
 	var p = area.get_parent()
 	if p.is_in_group("player"):
 		player = null
+
+
+func _on_AttackHitbox_area_entered(area: Area2D):
+	var target := area.get_parent()
+	if target.is_in_group("ataque"):
+		if target.has_method("receive_damage"):
+			target.receive_damage(damage, self)

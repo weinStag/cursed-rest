@@ -391,6 +391,8 @@ libraries = {
 }
 
 [node name="hitbox_arma" type="Area2D" parent="arma" groups=["ataque"]]
+monitoring = false
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="arma/hitbox_arma"]
 position = Vector2(14.4, 2.33333)
