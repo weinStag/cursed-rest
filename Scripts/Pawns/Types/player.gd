@@ -182,18 +182,20 @@ func input_priority():
 			input_history.append(direction)
 
 func set_direction() -> Vector2i:
-	# Handles the movement direction depending on the inputs
-	var direction: Vector2i = Vector2i()
+	var direction := Vector2i.ZERO
 	
-	if input_history.size():
-		for i in input_history:
-			direction += MOVEMENTS[i]
-		
-		match(input_history.back()):
-			'ui_right', 'ui_left': if direction.x != 0: direction.y = 0
-			'ui_up', 'ui_down': if direction.y != 0: direction.x = 0
-	
-	return direction
+	if Input.is_action_pressed("ui_up"):
+		direction.y -= 1
+	if Input.is_action_pressed("ui_down"):
+		direction.y += 1
+	if Input.is_action_pressed("ui_left"):
+		direction.x -= 1
+	if Input.is_action_pressed("ui_right"):
+		direction.x += 1
+
+	return Vector2i(round(direction.x), round(direction.y))
+
+
 
 func _move_tween_done():
 	move_tween.kill()

@@ -349,7 +349,7 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5pnro"]
-size = Vector2(57.6, 15.3333)
+size = Vector2(16, 15.3333)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tlhq4"]
 size = Vector2(16, 23)
@@ -393,7 +393,7 @@ libraries = {
 [node name="hitbox_arma" type="Area2D" parent="arma" groups=["ataque"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="arma/hitbox_arma"]
-position = Vector2(35.2, 2.33333)
+position = Vector2(14.4, 2.33333)
 shape = SubResource("RectangleShape2D_5pnro")
 
 [node name="Area2D" type="Area2D" parent="." groups=["player"]]
