@@ -1187,7 +1187,7 @@ position = Vector2(0.0169067, -4.60992)
 shape = SubResource("RectangleShape2D_08va7")
 
 [node name="Boss" parent="Pawns" instance=ExtResource("9_pnsqa")]
-position = Vector2(290.55, 103.157)
+position = Vector2(182.782, 84.9176)
 move_pattern = Array[Vector2i]([Vector2i(0, 0)])
 
 [node name="Inimigo" parent="Pawns" instance=ExtResource("12_08va7")]

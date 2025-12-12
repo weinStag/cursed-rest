@@ -1,5 +1,10 @@
 extends PawnMobile
 
+# Attack system
+var is_attacking: bool = false
+@export var attack_cooldown: float = 0.35
+var can_attack: bool = true
+
 var status: Dictionary = {
 	'health': 250,
 	'stamina': 100,
@@ -65,6 +70,12 @@ func _on_knockback_cooldown():
 
 
 func _process(_delta):
+	var mouse_pos = get_global_mouse_position()
+	$SwordPivot.look_at(mouse_pos)
+	
+	if Input.is_action_just_pressed("ui_mb1"):
+		try_attack()
+	
 	# Sistema de detecção tap vs hold para ui_roll
 	if Input.is_action_just_pressed("ui_roll"):
 		roll_button_press_time = 0.0
@@ -104,6 +115,31 @@ func _process(_delta):
 			var target_position: Vector2i = Grid.request_move(self, input_direction)
 			if target_position:
 				move_to(target_position)
+
+func try_attack():
+	if not can_attack or is_attacking or is_rolling or is_knockbacking:
+		return
+
+	is_attacking = true
+	can_attack = false
+
+	# ativa hitbox
+	$SwordPivot/SwordArea.monitoring = true
+
+	# animação de ataque simples (girando espada)
+	var tween = create_tween()
+	tween.tween_property($SwordPivot, "rotation_degrees", $SwordPivot.rotation_degrees + 120, 0.15)
+
+	tween.finished.connect(_finish_attack)
+
+func _finish_attack():
+	$SwordPivot/SwordArea.monitoring = false
+	is_attacking = false
+
+	# cooldown do ataque
+	await get_tree().create_timer(attack_cooldown).timeout
+	can_attack = true
+
 
 func execute_roll():
 	"""Executa o roll na direção atual do player"""
