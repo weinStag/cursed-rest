@@ -358,12 +358,14 @@ shape = SubResource("CircleShape2D_5n1dt")
 debug_color = Color(0.907035, 0.289866, 0.223736, 0.42)
 
 [node name="AttackHitbox" type="Area2D" parent="." groups=["hitbox_boss"]]
+monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
 position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_oyfy5")
 
 [node name="AttackSprite" type="Sprite2D" parent="AttackHitbox"]
+visible = false
 texture = ExtResource("3_572v3")
 
 [connection signal="area_entered" from="visao" to="." method="_on_visao_area_entered"]

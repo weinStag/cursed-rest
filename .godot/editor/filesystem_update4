@@ -1,4 +1,6 @@
-res://Scripts/Pawns/Types/player.gd
-res://Scenes/Pawns/player.tscn
+res://Text/game_text.en.translation
+res://Text/game_text.fr.translation
 res://Scenes/gameview.tscn
 res://Scenes/Maps/world.tscn
+res://Scenes/Pawns/player.tscn
+res://Scenes/Pawns/boss.tscn
