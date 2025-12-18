@@ -1,0 +1,7 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://cun6egcq333x2"]
+
+[ext_resource type="FontFile" uid="uid://b4v1hrhou23jb" path="res://Font/JMH Beda.otf" id="1_260kl"]
+
+[resource]
+Button/colors/font_hover_color = Color(0.141176, 0.94902, 0.94902, 1)
+Button/fonts/font = ExtResource("1_260kl")
