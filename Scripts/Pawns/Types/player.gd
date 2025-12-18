@@ -50,6 +50,8 @@ var knockback_timer: Timer
 var roll_button_press_time: float = 0.0
 var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
 
+
+
 func _ready():
 	base_speed = speed
 	
