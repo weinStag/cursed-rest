@@ -27,7 +27,7 @@ var is_dead: bool = false
 var input_history: Array[String] = []
 var cur_direction: Vector2i = Vector2i.DOWN
 var is_sprinting: bool = false
-var sprint_mult: float = 3.5
+var sprint_mult: float = 1.5
 var base_speed: float = 1.5
 
 # Roll System
@@ -47,8 +47,8 @@ var can_kockback: bool = true
 var knockback_timer: Timer
 
 # Detecção de tap vs hold
-var roll_button_press_time: float = 0.0
-var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
+var roll_button_press_time: float = 0.025
+var roll_tap_threshold: float = 0.10  # Tempo máximo para considerar um "tap" (em segundos)
 
 
 
