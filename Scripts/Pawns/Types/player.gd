@@ -270,16 +270,11 @@ func receive_damage(amount: int, attacker: Node2D):
 		apply_knockback(attacker)
 	else:
 		pass
-		#die()
+		die()
 
 func die():
 	print("Player morreu!")
-	# Desabilita movimento
-	#is_talking = true
-	#is_rolling = false
-	#is_moving = false
-	#is_dead = true
-	# Aqui você pode chamar animação, respawn, tela game over, etc.
+	get_tree().change_scene_to_file("res://title_screen.tscn")
 
 
 func calc_damage(damage) -> int:
