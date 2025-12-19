@@ -1,5 +1,5 @@
 extends PawnMobile
-
+signal health_changed(new_health, max_health)
 # Attack system
 var is_attacking: bool = false
 @export var attack_cooldown: float = 0.35
@@ -275,7 +275,7 @@ func receive_damage(amount: int, attacker: Node2D):
 	if new_health > 0:
 		apply_knockback(attacker)
 	else:
-		pass
+		get_tree().change_scene_to_file("res://game_over.tscn")
 		#die()
 
 func die():
