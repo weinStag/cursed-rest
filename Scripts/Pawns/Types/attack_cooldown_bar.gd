@@ -11,10 +11,6 @@ func _ready():
 	# Estilo visual simplificado
 	modulate = Color(1, 1, 1, 0.7)
 	
-	# Posição abaixo do player
-	position = Vector2(-12, 14)
-	size = Vector2(24, 4)
-	
 	# Pega referência ao player
 	player = get_parent()
 
@@ -31,3 +27,4 @@ func _process(_delta):
 		var progress = (player.attack_cooldown - player.attack_cooldown_timer) / player.attack_cooldown
 		value = progress * 100
 		modulate = Color(1, 0.6, 0, 0.7)  # Laranja quando em cooldown
+	

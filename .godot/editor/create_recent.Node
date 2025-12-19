@@ -12,4 +12,3 @@ AudioStreamPlayer2D
 AudioListener2D
 TextEdit
 RichTextLabel
-HBoxContainer

@@ -352,13 +352,10 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5pnro"]
-size = Vector2(20.2667, 16)
+size = Vector2(25.6, 37.3333)
 
 [node name="Player" type="Node2D" groups=["player"]]
 script = ExtResource("1_cghlj")
-attack_cooldown = null
-speed = null
-type = null
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_dy3y1")
@@ -409,7 +406,7 @@ monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SwordPivot/SwordArea"]
 visible = false
-position = Vector2(16.5333, 2.66667)
+position = Vector2(16, 0)
 shape = SubResource("RectangleShape2D_5pnro")
 
 [node name="ProgressBar" type="ProgressBar" parent="."]

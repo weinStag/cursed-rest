@@ -9,6 +9,8 @@ var is_attacking: bool = false
 @export var attack_cooldown: float = 0.35
 var can_attack: bool = true
 var attack_cooldown_timer: float = 0.0  # Timer visual do cooldown
+var attack_stamina_cost: int = 3  # Custo de stamina por ataque
+var attack_dash_distance: float = 20.0  # Distância do dash no ataque
 
 # Constants for max values
 const MAX_HEALTH: int = 250
@@ -54,7 +56,7 @@ var base_speed: float = 1.5
 
 # Roll System
 var is_rolling: bool = false
-var roll_distance: int = 3  # Quantas células o roll percorre
+var roll_distance: int = 2  # Quantas células o roll percorre
 var roll_speed_mult: float = 5.0  # Multiplicador de velocidade do roll
 var roll_cooldown: float = 0.5  # Tempo de cooldown entre rolls (em segundos)
 var can_roll: bool = true
@@ -120,6 +122,23 @@ func _process(_delta):
 	if Input.is_action_just_pressed("ui_heal") and can_heal():
 		use_heal()
 	
+	# ROLL SYSTEM - PROCESSA ANTES DE TUDO
+	# Captura direção ENQUANTO as teclas estão pressionadas
+	var roll_input_direction: Vector2i = Vector2i.ZERO
+	if Input.is_action_pressed("ui_up"):
+		roll_input_direction.y -= 1
+	if Input.is_action_pressed("ui_down"):
+		roll_input_direction.y += 1
+	if Input.is_action_pressed("ui_left"):
+		roll_input_direction.x -= 1
+	if Input.is_action_pressed("ui_right"):
+		roll_input_direction.x += 1
+	
+	# Normaliza diagonal
+	if roll_input_direction != Vector2i.ZERO:
+		if roll_input_direction.y != 0:
+			roll_input_direction.x = 0
+	
 	# Sistema de detecção tap vs hold para ui_roll
 	if Input.is_action_just_pressed("ui_roll"):
 		roll_button_press_time = 0.0
@@ -130,27 +149,26 @@ func _process(_delta):
 	# Se soltar o botão rápido (tap), executa roll
 	if Input.is_action_just_released("ui_roll"):
 		if roll_button_press_time <= roll_tap_threshold and can_roll and not is_rolling and can_move():
-			# Pega a direção atual do input para o roll
-			var roll_direction: Vector2i = set_direction()
-			if roll_direction != Vector2i.ZERO:
-				execute_roll(roll_direction)
-			else:
-				# Se não houver input, usa a última direção
-				execute_roll(cur_direction)
+			# Roll/dodge na direção OPOSTA de onde está olhando (backward dodge)
+			var dodge_direction: Vector2i = -cur_direction
+			execute_roll(dodge_direction)
 			roll_button_press_time = 0.0
 			return
 		roll_button_press_time = 0.0
 	
 	# Sprint: apenas se estiver segurando por mais tempo que o threshold e tiver stamina
-	is_sprinting = Input.is_action_pressed("ui_roll") and roll_button_press_time > roll_tap_threshold and status['stamina'] > 0
+	is_sprinting = Input.is_action_pressed("ui_roll") and roll_button_press_time > roll_tap_threshold and status['stamina'] > 5
 	
 	# Não permite sprint durante o roll
 	if is_rolling:
 		is_sprinting = false
 	
-	# Consome stamina ao correr
+	# Consome stamina APENAS ao correr (sprint), andar é grátis
 	if is_sprinting:
 		consume_stamina(sprint_stamina_cost * _delta)
+		# Se stamina acabar, cancela sprint
+		if status['stamina'] <= 0:
+			is_sprinting = false
 	else:
 		# Regenera stamina quando não está correndo
 		regenerate_stamina(_delta)
@@ -174,28 +192,59 @@ func _process(_delta):
 				move_to(target_position)
 
 func try_attack():
-	if not can_attack or is_attacking or is_rolling or is_knockbacking:
+	# Verificações mais rigorosas
+	if not can_attack or is_rolling or is_knockbacking or is_talking:
+		return
+	
+	# Verifica stamina suficiente
+	if status['stamina'] < attack_stamina_cost:
+		print("Stamina insuficiente para atacar!")
+		return
+	
+	# Garante que qualquer tween anterior seja limpo
+	if move_tween and move_tween.is_running():
 		return
 
 	is_attacking = true
 	can_attack = false
 	attack_cooldown_timer = attack_cooldown  # Inicia o timer visual
-
-	# ativa hitbox
+	
+	# Consome stamina
+	consume_stamina(attack_stamina_cost)
+	
+	# Ativa hitbox IMEDIATAMENTE
 	$SwordPivot/SwordArea.monitoring = true
+	
+	# Calcula direção do dash em direção ao mouse
+	var mouse_pos := get_global_mouse_position()
+	var dash_direction := (mouse_pos - global_position).normalized()
+	var target_pos := global_position + (dash_direction * attack_dash_distance)
+	
+	# Dash rápido em direção ao mouse
+	var dash_tween := create_tween()
+	dash_tween.tween_property(self, "global_position", target_pos, 0.1)
+	dash_tween.set_ease(Tween.EASE_OUT)
+	dash_tween.set_trans(Tween.TRANS_QUAD)
 
-	# animação de ataque simples (girando espada)
-	var tween = create_tween()
-	tween.tween_property($SwordPivot, "rotation_degrees", $SwordPivot.rotation_degrees + 120, 0.15)
+	# animação de ataque (girando espada)
+	var swing_tween := create_tween()
+	swing_tween.tween_property($SwordPivot, "rotation_degrees", $SwordPivot.rotation_degrees + 120, 0.2)
 
-	tween.finished.connect(_finish_attack)
+	swing_tween.finished.connect(_finish_attack)
 
 func _finish_attack():
-	$SwordPivot/SwordArea.monitoring = false
+	# Desativa hitbox
+	if $SwordPivot/SwordArea:
+		$SwordPivot/SwordArea.monitoring = false
+	
 	is_attacking = false
 
-	# cooldown do ataque
-	await get_tree().create_timer(attack_cooldown).timeout
+	# cooldown do ataque usando create_timer
+	get_tree().create_timer(attack_cooldown).timeout.connect(_on_attack_cooldown_finished)
+
+func _on_attack_cooldown_finished():
+	# Força o reset do estado de ataque
+	is_attacking = false
 	can_attack = true
 	attack_cooldown_timer = 0.0  # Reseta o timer
 
@@ -334,6 +383,18 @@ func get_direction_name() -> String:
 func receive_damage(amount: int, attacker: Node2D):
 	if attacker == null:
 		return
+	
+	# Cancela ataque em andamento se estiver atacando
+	if is_attacking:
+		is_attacking = false
+		if $SwordPivot/SwordArea:
+			$SwordPivot/SwordArea.monitoring = false
+	
+	# Apenas reseta o cooldown, não força can_attack imediatamente
+	# O cooldown vai terminar naturalmente e permitir ataques
+	if attack_cooldown_timer > 0:
+		attack_cooldown_timer = min(attack_cooldown_timer, 0.2)
+	
 	var new_health := calc_damage(amount)
 	# Garante que a vida não fique negativa
 	if new_health < 0:

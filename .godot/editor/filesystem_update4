@@ -4,3 +4,5 @@ res://Scripts/Pawns/Types/player.gd
 res://Scripts/Pawns/Types/enemy.gd
 res://Scenes/hud.gd
 res://Scenes/Pawns/player.tscn
+res://Scripts/Pawns/Types/attack_cooldown_bar.gd
+res://Scenes/Pawns/boss.tscn

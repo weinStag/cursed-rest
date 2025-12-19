@@ -10789,9 +10789,6 @@ event_grid = NodePath("../Event_Grid")
 
 [node name="Player" parent="Pawns" instance=ExtResource("4_nyxsb")]
 position = Vector2(106, -363)
-attack_cooldown = 0.35
-speed = 1.5
-type = 0
 
 [node name="Camera2D" type="Camera2D" parent="Pawns/Player"]
 position = Vector2(5.87701, -5.55298)
