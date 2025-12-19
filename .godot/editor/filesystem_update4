@@ -1,5 +1,4 @@
 res://Scenes/Maps/world.tscn
-res://Scripts/Pawns/Types/player.gd
 res://Scenes/gameview.tscn
 res://Scenes/Pawns/boss.tscn
 res://Scenes/Pawns/inimigo.tscn
