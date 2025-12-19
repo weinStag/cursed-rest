@@ -1,6 +1,7 @@
 extends PawnMobile
 class_name Enemy
 
+@warning_ignore("unused_signal")
 signal trigger_dialogue
 
 signal died(enemy)
@@ -13,7 +14,7 @@ signal died(enemy)
 var health := 100
 
 # Stats base
-@export var damage := 10
+@export var damage := 7.5
 @export var knockback_distance := 2
 @export var attack_distance := 24
 @export var attack_cooldown := 3
@@ -143,7 +144,7 @@ func receive_damage(amount: int, attacker: Node2D):
 		die(attacker)
 
 
-func die(attacker: Node2D):
+func die(_attacker: Node2D):
 	print("[Enemy] morreu:", self)
 	emit_signal("died", self)
 

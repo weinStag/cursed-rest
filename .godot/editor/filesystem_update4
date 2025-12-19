@@ -1,7 +1,6 @@
-res://Scenes/gameview.tscn
 res://Scenes/Maps/world.tscn
-res://Scenes/Pawns/player.tscn
-res://Scenes/Pawns/boss.tscn
-res://title_screen.tscn
-res://intro.tscn
+res://Scenes/hud.tscn
 res://Scripts/Pawns/Types/player.gd
+res://Scripts/Pawns/Types/enemy.gd
+res://Scenes/hud.gd
+res://Scenes/Pawns/player.tscn

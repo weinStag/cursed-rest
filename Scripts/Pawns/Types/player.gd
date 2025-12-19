@@ -1,9 +1,18 @@
 extends PawnMobile
 signal health_changed(new_health, max_health)
+signal stamina_changed(new_stamina, max_stamina)
+signal souls_changed(new_souls)
+signal heal_changed(heal_remaining, max_heals)
+
 # Attack system
 var is_attacking: bool = false
 @export var attack_cooldown: float = 0.35
 var can_attack: bool = true
+var attack_cooldown_timer: float = 0.0  # Timer visual do cooldown
+
+# Constants for max values
+const MAX_HEALTH: int = 250
+const MAX_STAMINA: int = 100
 
 var status: Dictionary = {
 	'health': 250,
@@ -14,6 +23,13 @@ var status: Dictionary = {
 	'agility': 10
 }
 
+# Soul counter
+var souls: int = 0
+
+# Enemy kill counter for heal rewards
+var enemy_kills: int = 0
+var kills_per_heal: int = 3
+
 const MOVEMENTS: Dictionary = {
 	'ui_up': Vector2i.UP,
 	'ui_left': Vector2i.LEFT,
@@ -23,11 +39,17 @@ const MOVEMENTS: Dictionary = {
 
 var is_dead: bool = false
 
+# Healing System
+var max_heal_uses: int = 2
+var heal_uses_remaining: int = 2
+var heal_amount: int = 100
+var is_healing: bool = false
+
 # Movement Related (+ animation)
 var input_history: Array[String] = []
 var cur_direction: Vector2i = Vector2i.DOWN
 var is_sprinting: bool = false
-var sprint_mult: float = 3.5
+var sprint_mult: float = 1.5
 var base_speed: float = 1.5
 
 # Roll System
@@ -37,6 +59,13 @@ var roll_speed_mult: float = 5.0  # Multiplicador de velocidade do roll
 var roll_cooldown: float = 0.5  # Tempo de cooldown entre rolls (em segundos)
 var can_roll: bool = true
 var roll_timer: Timer
+var roll_stamina_cost: int = 15  # Custo de stamina por roll
+
+# Stamina System
+var stamina_regen_rate: float = 10.0  # Stamina por segundo
+var stamina_regen_delay: float = 1.5  # Delay antes de começar a regenerar
+var stamina_regen_timer: float = 0.0
+var sprint_stamina_cost: float = 30.0  # Stamina por segundo ao correr
 
 # Knockback System
 var is_knockbacking: bool = false
@@ -54,7 +83,10 @@ var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (
 
 func _ready():
 	base_speed = speed
-	emit_signal("health_changed", status['health'], 250)
+	emit_signal("health_changed", status['health'], MAX_HEALTH)
+	emit_signal("stamina_changed", status['stamina'], MAX_STAMINA)
+	emit_signal("souls_changed", souls)
+	emit_signal("heal_changed", heal_uses_remaining, max_heal_uses)
 	# Configurar timer de cooldown do roll
 	roll_timer = Timer.new()
 	roll_timer.one_shot = true
@@ -75,8 +107,18 @@ func _process(_delta):
 	var mouse_pos = get_global_mouse_position()
 	$SwordPivot.look_at(mouse_pos)
 	
+	# Atualiza o timer de cooldown do ataque
+	if attack_cooldown_timer > 0:
+		attack_cooldown_timer -= _delta
+		if attack_cooldown_timer <= 0:
+			attack_cooldown_timer = 0
+	
 	if Input.is_action_just_pressed("ui_mb1"):
 		try_attack()
+	
+	# Healing system
+	if Input.is_action_just_pressed("ui_heal") and can_heal():
+		use_heal()
 	
 	# Sistema de detecção tap vs hold para ui_roll
 	if Input.is_action_just_pressed("ui_roll"):
@@ -88,17 +130,30 @@ func _process(_delta):
 	# Se soltar o botão rápido (tap), executa roll
 	if Input.is_action_just_released("ui_roll"):
 		if roll_button_press_time <= roll_tap_threshold and can_roll and not is_rolling and can_move():
-			execute_roll()
+			# Pega a direção atual do input para o roll
+			var roll_direction: Vector2i = set_direction()
+			if roll_direction != Vector2i.ZERO:
+				execute_roll(roll_direction)
+			else:
+				# Se não houver input, usa a última direção
+				execute_roll(cur_direction)
 			roll_button_press_time = 0.0
 			return
 		roll_button_press_time = 0.0
 	
-	# Sprint: apenas se estiver segurando por mais tempo que o threshold
-	is_sprinting = Input.is_action_pressed("ui_roll") and roll_button_press_time > roll_tap_threshold
+	# Sprint: apenas se estiver segurando por mais tempo que o threshold e tiver stamina
+	is_sprinting = Input.is_action_pressed("ui_roll") and roll_button_press_time > roll_tap_threshold and status['stamina'] > 0
 	
 	# Não permite sprint durante o roll
 	if is_rolling:
 		is_sprinting = false
+	
+	# Consome stamina ao correr
+	if is_sprinting:
+		consume_stamina(sprint_stamina_cost * _delta)
+	else:
+		# Regenera stamina quando não está correndo
+		regenerate_stamina(_delta)
 	
 	speed = base_speed * (sprint_mult if is_sprinting else 1.0)
 	
@@ -124,6 +179,7 @@ func try_attack():
 
 	is_attacking = true
 	can_attack = false
+	attack_cooldown_timer = attack_cooldown  # Inicia o timer visual
 
 	# ativa hitbox
 	$SwordPivot/SwordArea.monitoring = true
@@ -141,35 +197,52 @@ func _finish_attack():
 	# cooldown do ataque
 	await get_tree().create_timer(attack_cooldown).timeout
 	can_attack = true
+	attack_cooldown_timer = 0.0  # Reseta o timer
 
 
-func execute_roll():
-	"""Executa o roll na direção atual do player"""
+func execute_roll(roll_direction: Vector2i):
+	"""Executa o roll na direção especificada"""
+	# Verifica se tem stamina suficiente
+	if status['stamina'] < roll_stamina_cost:
+		print("Stamina insuficiente para rolar!")
+		return
+	
 	is_rolling = true
 	can_roll = false
 	
-	# Tenta mover múltiplas células na direção do roll
-	var cells_moved: int = 0
-	var last_valid_position: Vector2 = position
+	# Consome stamina
+	consume_stamina(roll_stamina_cost)
 	
-	# Tenta rolar pela distância especificada
+	# Verifica célula por célula até a distância máxima do roll
+	var final_position: Vector2 = position
+	var cells_moved: int = 0
+	
+	# Salva a posição inicial no grid
+	var start_cell: Vector2i = Grid.actor_grid.local_to_map(position)
+	
 	for i in range(1, roll_distance + 1):
-		var target_position: Vector2 = Grid.request_move(self, cur_direction)
+		# Calcula a próxima célula na direção do roll
+		var next_cell: Vector2i = start_cell + (roll_direction * i)
+		var cell_type: int = Grid.actor_grid.get_cell_source_id(next_cell)
 		
-		if target_position:
-			last_valid_position = target_position
-			cells_moved += 1
+		# Verifica se a célula está vazia (EMPTY = -1)
+		if cell_type == Grid.EMPTY:
+			final_position = Grid.actor_grid.map_to_local(next_cell)
+			cells_moved = i
 		else:
-			break  # Para se encontrar obstáculo
+			break  # Para ao encontrar obstáculo
 	
 	# Executa o movimento do roll se conseguiu mover pelo menos 1 célula
 	if cells_moved > 0:
-		# Animação de roll (você pode personalizar)
-		set_anim_direction(cur_direction)
-		# Aqui você pode adicionar uma animação específica de roll
-		# Ex: $AnimationPlayer.play("roll_" + get_direction_name())
+		# Atualiza o grid: limpa posição antiga e marca nova
+		var final_cell: Vector2i = Grid.actor_grid.local_to_map(final_position)
+		Grid.actor_grid.set_cell(start_cell, Grid.EMPTY, Vector2i.ZERO)
+		Grid.actor_grid.set_cell(final_cell, type, Vector2i.ZERO)
 		
-		roll_to(last_valid_position)
+		# Animação de roll
+		set_anim_direction(roll_direction)
+		
+		roll_to(final_position)
 	else:
 		# Se não conseguiu rolar, cancela o roll
 		finish_roll()
@@ -267,16 +340,11 @@ func receive_damage(amount: int, attacker: Node2D):
 		new_health = 0 
 	print(new_health)
 	status["health"] = new_health
-	# >>> LINHA NOVA: Avisa o HUD que a vida mudou <<<
-	# Você pode querer definir uma variável 'max_health' no dicionário status também
-	# Por enquanto, estou usando 250 fixo ou você pode calcular
-	var max_health = 250 # Ou status['max_health'] se você adicionar lá
-	emit_signal("health_changed", new_health, max_health)
+	emit_signal("health_changed", new_health, MAX_HEALTH)
 	if new_health > 0:
 		apply_knockback(attacker)
 	else:
-		get_tree().change_scene_to_file("res://game_over.tscn")
-		#die()
+		get_tree().call_deferred("change_scene_to_file", "res://game_over.tscn")
 
 func die():
 	print("Player morreu!")
@@ -363,11 +431,11 @@ func _on_area_2d_area_entered(area: Area2D):
 		return
 
 	if area.is_in_group("hitbox"):
-		receive_damage(50, attacker)
+		receive_damage(25, attacker)
 		return
 
 	if area.is_in_group("hitbox_boss"):
-		receive_damage(75, attacker)
+		receive_damage(50, attacker)
 		return
 
 
@@ -375,7 +443,90 @@ func _on_sword_area_area_entered(area):
 	print("acertou:", area.name)
 	var enemy = area.get_parent()
 	if enemy.is_in_group("enemy"):
-		deal_damage(enemy, 25)
+		# Conecta ao sinal de morte do inimigo para ganhar almas
+		if not enemy.died.is_connected(_on_enemy_died):
+			enemy.died.connect(_on_enemy_died)
+		deal_damage(enemy, 10)
 	elif enemy.is_in_group("boss"):
-		deal_damage(enemy, 40)
+		# Boss também dá almas (mais)
+		if not enemy.died.is_connected(_on_boss_died):
+			enemy.died.connect(_on_boss_died)
+		deal_damage(enemy, 5)
+
+func _on_enemy_died(_enemy: Node2D):
+	"""Callback quando um inimigo morre - adiciona almas aleatórias"""
+	var soul_amount: int = randi_range(50, 100)
+	add_souls(soul_amount)
+	
+	# Incrementa contador de kills e verifica se deve dar heal
+	enemy_kills += 1
+	if enemy_kills >= kills_per_heal:
+		enemy_kills = 0
+		grant_heal()
+		print("3 inimigos derrotados! Heal concedido!")
+
+func _on_boss_died(_boss: Node2D):
+	"""Callback quando um boss morre - adiciona mais almas"""
+	var soul_amount: int = randi_range(200, 300)
+	add_souls(soul_amount)
+
+func can_heal() -> bool:
+	"""Verifica se o player pode usar heal"""
+	return heal_uses_remaining > 0 and not is_healing and not is_moving and not is_rolling and not is_attacking and not is_knockbacking
+
+func use_heal():
+	"""Usa uma carga de heal"""
+	if not can_heal():
+		return
+	
+	is_healing = true
+	heal_uses_remaining -= 1
+	
+	# Cura o player
+	var new_health: int = min(status['health'] + heal_amount, MAX_HEALTH)
+	status['health'] = new_health
+	
+	# Emite sinais para atualizar HUD
+	emit_signal("health_changed", new_health, MAX_HEALTH)
+	emit_signal("heal_changed", heal_uses_remaining, max_heal_uses)
+	
+	print("Heal usado! Vida: ", new_health, "/", MAX_HEALTH, " - Heals restantes: ", heal_uses_remaining)
+	
+	# Animação de heal (pequeno delay)
+	await get_tree().create_timer(0.5).timeout
+	is_healing = false
+
+func consume_stamina(amount: float):
+	"""Consome stamina e atualiza a UI"""
+	status['stamina'] = max(0, status['stamina'] - amount)
+	emit_signal("stamina_changed", status['stamina'], MAX_STAMINA)
+	stamina_regen_timer = stamina_regen_delay  # Reseta o timer de regeneração
+
+func regenerate_stamina(delta: float):
+	"""Regenera stamina ao longo do tempo"""
+	if status['stamina'] >= MAX_STAMINA:
+		return
+	
+	if stamina_regen_timer > 0:
+		stamina_regen_timer -= delta
+		return
+	
+	var regen_amount := stamina_regen_rate * delta
+	status['stamina'] = min(MAX_STAMINA, status['stamina'] + regen_amount)
+	emit_signal("stamina_changed", status['stamina'], MAX_STAMINA)
+
+func add_souls(amount: int):
+	"""Adiciona almas ao contador"""
+	souls += amount
+	emit_signal("souls_changed", souls)
+	print("Almas coletadas: +", amount, " | Total: ", souls)
+
+func grant_heal():
+	"""Concede um heal extra ao jogador"""
+	if heal_uses_remaining < max_heal_uses:
+		heal_uses_remaining += 1
+		emit_signal("heal_changed", heal_uses_remaining, max_heal_uses)
+		print("Heal extra concedido! Total: ", heal_uses_remaining, "/", max_heal_uses)
+	else:
+		print("Heals já estão no máximo!")
 		

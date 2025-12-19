@@ -1,8 +1,9 @@
-[gd_scene load_steps=43 format=3 uid="uid://82egl20vpf7n"]
+[gd_scene load_steps=44 format=3 uid="uid://82egl20vpf7n"]
 
 [ext_resource type="Script" uid="uid://bbu8j0ryeda7i" path="res://Scripts/Pawns/Types/player.gd" id="1_cghlj"]
 [ext_resource type="Texture2D" uid="uid://n4h41o7d7rbs" path="res://Graphics/Pawns/actor_man.png" id="2_dy3y1"]
 [ext_resource type="Texture2D" uid="uid://c0ocitkn51t3w" path="res://Graphics/items/nzS5Sj.png" id="3_338dp"]
+[ext_resource type="Script" uid="uid://ducnxom5n846s" path="res://Scripts/Pawns/Types/attack_cooldown_bar.gd" id="4_5pnro"]
 
 [sub_resource type="Animation" id="Animation_5p5oj"]
 resource_name = "idle_down"
@@ -355,6 +356,9 @@ size = Vector2(20.2667, 16)
 
 [node name="Player" type="Node2D" groups=["player"]]
 script = ExtResource("1_cghlj")
+attack_cooldown = null
+speed = null
+type = null
 
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_dy3y1")
@@ -407,6 +411,16 @@ monitoring = false
 visible = false
 position = Vector2(16.5333, 2.66667)
 shape = SubResource("RectangleShape2D_5pnro")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+offset_left = -7.0
+offset_top = 12.0
+offset_right = -3.0
+offset_bottom = 26.0
+rotation = -1.57055
+fill_mode = 2
+show_percentage = false
+script = ExtResource("4_5pnro")
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="area_entered" from="SwordPivot/SwordArea" to="." method="_on_sword_area_area_entered"]
