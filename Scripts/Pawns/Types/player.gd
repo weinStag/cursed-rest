@@ -49,7 +49,7 @@ var knockback_timer: Timer
 # Detecção de tap vs hold
 var roll_button_press_time: float = 0.0
 var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
-signal health_changed(new_health, max_health)
+
 
 
 func _ready():
@@ -275,11 +275,11 @@ func receive_damage(amount: int, attacker: Node2D):
 	if new_health > 0:
 		apply_knockback(attacker)
 	else:
-		die() # Descomentei para testar a morte
+		pass
+		#die()
 
 func die():
 	print("Player morreu!")
-	get_tree().change_scene_to_file("res://game_over.tscn")
 	# Desabilita movimento
 	#is_talking = true
 	#is_rolling = false

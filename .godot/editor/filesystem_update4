@@ -1,9 +1,12 @@
+res://title_screen.tscn
 res://Scenes/gameview.tscn
 res://Scenes/Maps/world.tscn
+res://Scenes/gameview.tscn
+res://Scenes/Pawns/boss.tscn
+res://Scenes/Pawns/inimigo.tscn
 res://Scenes/Pawns/player.tscn
 res://Scenes/Pawns/boss.tscn
-res://title_screen.tscn
 res://intro.tscn
-res://cutscene_01.tscn
-res://Scenes/hud.tscn
-res://game_over.tscn
+res://Scripts/Pawns/Types/player.gd
+res://intro_animation.gd
+res://title_screen.gd

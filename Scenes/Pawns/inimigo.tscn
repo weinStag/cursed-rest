@@ -348,18 +348,21 @@ parameters/TimeScale/scale = 1.0
 [node name="hitbox" type="Area2D" parent="." groups=["hitbox"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="hitbox"]
+visible = false
 position = Vector2(0, -4.5)
 shape = SubResource("RectangleShape2D_3sqja")
 
 [node name="visao" type="Area2D" parent="." groups=["visao"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="visao"]
+visible = false
 shape = SubResource("CircleShape2D_5n1dt")
 debug_color = Color(0.907035, 0.289866, 0.223736, 0.42)
 
 [node name="AttackHitbox" type="Area2D" parent="." groups=["hitbox"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
+visible = false
 position = Vector2(0, 6)
 shape = SubResource("RectangleShape2D_5n1dt")
 
