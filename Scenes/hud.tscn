@@ -1,10 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://jl1xd7v4vsli"]
+[gd_scene load_steps=4 format=3 uid="uid://jl1xd7v4vsli"]
 
-[ext_resource type="Texture2D" uid="uid://clolt0da1hneb" path="res://Graphics/CollisionTiles/actor.png" id="1_e0onf"]
+[ext_resource type="Texture2D" uid="uid://bb1lkcampp57q" path="res://Image/HEALTHBARunder.png" id="1_fccik"]
+[ext_resource type="Texture2D" uid="uid://ce3wihnqbxp3b" path="res://Image/HEALTHBARpROGRESS.png" id="2_bjfho"]
+[ext_resource type="Script" uid="uid://bj11ljfur6apj" path="res://Scenes/texture_progress_bar.gd" id="3_bjfho"]
 
 [node name="Hud" type="CanvasLayer"]
 
-[node name="TextureRect" type="TextureRect" parent="."]
-offset_right = 40.0
-offset_bottom = 16.0
-texture = ExtResource("1_e0onf")
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+offset_top = 176.0
+offset_right = 67.0
+offset_bottom = 232.0
+min_value = 31.0
+max_value = 82.0
+value = 82.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = ExtResource("1_fccik")
+texture_progress = ExtResource("2_bjfho")
+script = ExtResource("3_bjfho")

@@ -1,0 +1,6 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dbmed6kokwxl3"]
+
+[ext_resource type="FontFile" uid="uid://b4v1hrhou23jb" path="res://Font/JMH Beda.otf" id="1_vaout"]
+
+[resource]
+Label/fonts/font = ExtResource("1_vaout")

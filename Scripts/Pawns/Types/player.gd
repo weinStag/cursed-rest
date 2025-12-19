@@ -49,12 +49,12 @@ var knockback_timer: Timer
 # Detecção de tap vs hold
 var roll_button_press_time: float = 0.0
 var roll_tap_threshold: float = 0.15  # Tempo máximo para considerar um "tap" (em segundos)
-
+signal health_changed(new_health, max_health)
 
 
 func _ready():
 	base_speed = speed
-	
+	emit_signal("health_changed", status['health'], 250)
 	# Configurar timer de cooldown do roll
 	roll_timer = Timer.new()
 	roll_timer.one_shot = true
@@ -261,19 +261,25 @@ func get_direction_name() -> String:
 func receive_damage(amount: int, attacker: Node2D):
 	if attacker == null:
 		return
-
 	var new_health := calc_damage(amount)
+	# Garante que a vida não fique negativa
+	if new_health < 0:
+		new_health = 0 
 	print(new_health)
 	status["health"] = new_health
-
+	# >>> LINHA NOVA: Avisa o HUD que a vida mudou <<<
+	# Você pode querer definir uma variável 'max_health' no dicionário status também
+	# Por enquanto, estou usando 250 fixo ou você pode calcular
+	var max_health = 250 # Ou status['max_health'] se você adicionar lá
+	emit_signal("health_changed", new_health, max_health)
 	if new_health > 0:
 		apply_knockback(attacker)
 	else:
-		pass
-		#die()
+		die() # Descomentei para testar a morte
 
 func die():
 	print("Player morreu!")
+	get_tree().change_scene_to_file("res://game_over.tscn")
 	# Desabilita movimento
 	#is_talking = true
 	#is_rolling = false
