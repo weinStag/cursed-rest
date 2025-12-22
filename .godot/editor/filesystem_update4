@@ -1,4 +1,5 @@
-res://Scenes/Pawns/boss.tscn
-res://game_over.tscn
 res://Scenes/Pawns/player.tscn
+res://Scripts/Pawns/Types/player.gd
+res://game_over.tscn
 res://Scenes/Pawns/inimigo.tscn
+res://Scenes/Pawns/boss.tscn

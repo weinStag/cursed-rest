@@ -409,6 +409,7 @@ func receive_damage(amount: int, attacker: Node2D):
 
 func die():
 	print("Player morreu!")
+	get_tree().change_scene_to_file("res://game_over.tscn")
 	# Desabilita movimento
 	#is_talking = true
 	#is_rolling = false
